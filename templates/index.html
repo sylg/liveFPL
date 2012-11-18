@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<head>
+  <title>liveFPL</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="/static/css/bootstrap.css" rel="stylesheet">
+  <link href="/static/css/custom.css" rel="stylesheet">
+  <link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
+	<script src="http://code.jquery.com/jquery-latest.js"></script>
+	<script src="/static/js/bootstrap.js"></script>
+
+<script src="http://js.pusher.com/1.12/pusher.min.js" type="text/javascript"></script>
+
+
+</head>
+
+
+<body>
+    <div id="loadScreen" style="display: none;width: 100%; height: 100%; top: 0pt;left: 0pt;">
+   <div id="loadScr" style="filter: alpha(opacity = 65);  z-index: 9999;border: medium none; margin: 0pt; padding: 0pt; width: 100%; height: 100%; top: 0pt;left: 0pt; background-color: rgb(0, 0, 0); opacity: 0.2; cursor: wait; position: fixed;"></div>
+   <div id="loader"  style="z-index: 10000; position: fixed; padding: 0px; margin: 0px;width: 30%; top: 40%; left: 35%; text-align: center;cursor: wait; ">
+      <div class="progress progress-success progress-striped active">
+        <div class="bar" style="width: 100%"></div>
+      </div>
+      <p>Please wait while we fetch your team and league information</p>
+   </div>
+</div>
+    <div class="hero-unit">
+      <h1>LiveFPL</h1>
+      <p>Alpha Version. Lots of Bugs, Not pretty.</p>
+      <form id="live" class="form-inline">
+        <label>Your Team ID</label>
+          <input id="team_id" type="text" name="team_id" placeholder="ex: 37828">
+          <button class="btn btn-success" id="submit">Go</button>
+        </form>
+
+    </div>
+
+
+<!-- Loading modal -->
+<div class="modal hide" id="loading" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+  <div class="modal-body">
+    <p>Please wait while we fetch your team and league information. This can take a minute or 2. We only do this once. All further updates are in <strong>real time!</strong></p>
+    <div class="progress progress-success progress-striped active">
+      <div class="bar" style="width: 100%"></div>
+    </div>
+  </div>
+</div>
+<!-- League pick modal -->
+<div class="modal hide fade" id="leaguepick" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Pick the league you want to follow live</h3>
+  </div>
+  <div class="modal-body">
+    <ul class="nav nav-tabs nav-stacked" id="league-yes">
+    </ul>
+    <ul class="nav nav-tabs nav-stacked" id="league-no">
+    </ul>
+  </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+var pusher = new Pusher('b2c9525770d59267a6a2');
+
+$('#live').submit(function(){
+    $(this).toggleClass('loading');
+    $('#loading').on('shown',function(){
+        var team_id = $('#team_id').val()
+    
+        $.get('/getleagues?team_id='+team_id, function(data) {
+            if (data != "None") {
+                $('#loading').modal('hide');
+                $('#leaguepick').modal();
+                $.each(data, function(i, val) {
+                    if (val.players == 0 ) {
+                        $('#league-no').append('<li><a href="#">'+val.name+'</a></li>')
+                    }
+                    else {
+                        if (val.type == "classic"){
+                              $('#league-yes').append('<li><a href="/classic?league_id='+i+'&team_id='+team_id+'">'+val.name+'</a></li>');
+                            }
+                            else {
+                              $('#league-yes').append('<li><a href="/h2h?league_id='+i+'&team_id='+team_id+'">'+val.name+' (H2H League not yet supported)</a></li>');
+                            }
+                    }
+                }); 
+            }
+            else {
+
+                var channel = pusher.subscribe(team_id);  
+                channel.bind('league', function(data) {
+                    console.log("I'm connected to "+team_id)
+                    $('#loading').modal('hide');
+                    $('#leaguepick').modal();
+                    var notsupported = 0;
+                    $.each(data.message, function(i, val) {
+                        if (val.players == 0 ) {
+                            $('#league-no').append('<li><a href="#">'+val.name+'</a></li>')
+                            notsupported ++;
+                        }
+                        else {
+                            if (val.type == "classic"){
+                              $('#league-yes').append('<li><a href="/classic?league_id='+i+'&team_id='+team_id+'">'+val.name+'</a></li>');
+                            }
+                            else {
+                              $('#league-yes').append('<li><a href="/h2h?league_id='+i+'&team_id='+team_id+'">'+val.name+' (H2H League not yet supported)</a></li>');
+                            }
+                        }
+                    });
+                    if ( notsupported > 0) {
+                            $('#league-no').before('<p>Unsupported League</p>');
+                            $('#league-yes').before('<p>Supported League</p>')
+                        }
+                });
+            }
+        });
+    });
+    $('#loading').modal('show');
+    return false;
+});
+
+</script>
+</body>
+</html>
