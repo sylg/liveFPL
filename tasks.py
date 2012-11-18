@@ -49,9 +49,9 @@ def scrapteam(teamid,currentgw):
 			#if player hasn't played yet. Convert his points to 0 and mark him as not played
 			if not points.isdigit():
 				points = 0
-				played = True
-			else:
 				played = False
+			else:
+				played = True
 			#check if he's the captain
 			if player.find(class_='ismCaptainOn'):
 				captain = True

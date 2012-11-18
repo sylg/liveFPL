@@ -68,6 +68,8 @@
 				<thead>
 					<tr>
 						<th class="anim:constant sorter-false">Team Name</th>
+						<th class="anim:constant sorter-false">Captain</th>
+						<th class="anim:constant sorter-false">Remaining Player(s)</th>
 						<th class="anim:constant sorter-false"><span rel='tooltip' data-title='Total Point for the gameweek {{currentgw}}'>Current GW</span></th>
 						<th class="anim:constant sorter-false"><span rel='tooltip'data-title='Total Point for this season, including this GW points'>Total Points</span></th>
 					</tr>
@@ -194,19 +196,34 @@ $(document).ready(function(){
 							var id = values['id'];
 							var transfers = values['transfers'];
 							var lineup = values['lineup'];
+							var captain = getCaptain(lineup)[0];
+							var remaining = getCaptain(lineup)[1];
+
 							$('#xtable').append("<tr><td><a href='http://fantasy.premierleague.com/entry/"+id+"/event-history/{{currentgw}}/'>"
-														+teamname+"</a></td><td>"+gwpts+"</td><td>"+totalpts+"</td></tr>")
+														+teamname+"</a></td><td>"+captain+"</td><td>"+remaining+"</td><td>"+gwpts+"</td><td>"+totalpts+"</td></tr>")
 
 
 						$('#xtable').fadeIn('slow');
-					});
-
-
+						});
 		    		});
 		    	}
-
-
 		 	});
+
+// Helpfer function for table update
+function getCaptain (lineup){
+	var captain = "Error";
+	var remaining = 11;
+	$.each(lineup, function(i, player){
+		if (player['captain'] == true) {
+			captain = i;
+		}
+		if (player['played'] == true && player['bench'] == false) {
+			remaining --;
+		}
+	});
+	return [captain,remaining];
+}
+
 
 
 
