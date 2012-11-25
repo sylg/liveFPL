@@ -25,8 +25,7 @@ def get_teams_in_league(leagueid):
 		r.hset('league:%s:info'%leagueid,"players", r.scard('league:%s'%leagueid))
 	else:
 		print "Error got status code:%s" % response.status_code
-		print "got error %s when trying to get the teams in league %s. Trying %s more time"%(response.status_code, leagueid, retry_counter)
-		retry_counter = retry_counter - 1 # Need to add a counter through redis
+		print "got error %s when trying to get the teams in league %s."%(response.status_code, leagueid)
 		get_teams_in_league(leagueid)
 
 
@@ -72,6 +71,16 @@ def new_team(teamid,currentgw):
 			get_teams_in_league(league)
 		else:
 			"not scrapping, it's a not supported H2H league"
+
+
+
+### Check if string is number or nor
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
 
 
 

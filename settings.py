@@ -38,9 +38,11 @@ rp = redis.StrictRedis(host='localhost', port=6379, db=1)
 rdb = redis.StrictRedis(host='localhost', port=6379, db=2)
 
 
-#Requests Headers
+#Requests Stuff
 
 headers = {'User-agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'}
+payload = {'action': 'https://users.premierleague.com/PremierUser/redirectLogin','email': 'baboo2@yopmail.com','password': 'bibi2000'}
+
 
 
 #Period Task timer

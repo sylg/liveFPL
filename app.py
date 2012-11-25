@@ -3,7 +3,8 @@ import redis
 import os
 from helpers import *
 from tasks import *
-
+import json
+import random
 
 app = Flask(__name__)
 
@@ -14,7 +15,7 @@ def index():
 @app.route("/getleagues")
 def new_team():
 	team_id = str(request.args.get('team_id'))
-	if r.exists('scraptimer:%s'%team_id):
+	if r.exists('scraptimer:%s'%team_id) and len(r.smembers('team:%s:leagues'%team_id)) > 0:
 		print "team %s already in DB. Don't scrap time remaning on timer: %s"%(team_id, r.ttl('scraptimer:%s'%team_id))
 		returned_data = {}
 		for league in r.smembers('team:%s:leagues'%team_id):
@@ -28,26 +29,31 @@ def new_team():
 		r.expire('scraptimer:%s'%team_id, 3000)
 		return "None"
 
-
 @app.route("/classic")
 def classic():
 	team_id = str(request.args.get('team_id'))
 	league_id = str(request.args.get('league_id'))
-	get_classicdata.delay(league_id)
 	leaguename = r.hget('league:%s:info'%league_id,'name')
 	leagues = []
 	for league in r.smembers('team:%s:leagues'%team_id):
 		leagues.append([league,r.hgetall('league:%s:info'%league)])
+	if r.exists('scrapcache:%s'%league_id):
+		return_data = json.loads(r.get('scrapcache:%s'%league_id))
+		data = "old"
+	else:
+		return_data = 0
+		data = "fresh"
+		get_classicdata.delay(league_id)
+	size = r.scard('league:%s'%league_id)
+	livefpl_status = r.get('livefpl_status')
 
-	return render_template("classic.html", leaguename=leaguename,leagues=leagues,league_id=league_id,currentgw=12)
+	#Get Random Opta tweet
+	tweets = []
+	for tweet in r.hgetall('opta_tweet'):
+		tweets.append([tweet,r.hget('opta_tweet',tweet)])
 
 
-
-@app.route('/test')
-def test():
-	get_classicdata.delay(48483)
-	return "prout"
-
+	return render_template("classic.html",tweets=tweets,leaguename=leaguename,leagues=leagues,league_id=league_id,currentgw=r.get('currentgw'),return_data=return_data,size=size,data=data,livefpl_status=livefpl_status)
 
 if __name__ == '__main__':
 	# Bind to PORT if defined, otherwise default to 5000.
