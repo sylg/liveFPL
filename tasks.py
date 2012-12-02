@@ -12,7 +12,7 @@ from twython import Twython
 import unicodedata
 from datetime import timedelta
 
-celery = Celery('tasks', broker='redis://localhost:6379', backend='redis://localhost:6379')
+celery = Celery('tasks', broker=redis_celery_url, backend=redis_celery_url)
 
 #GENERAL INFO SCRAPPING
 
