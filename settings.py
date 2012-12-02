@@ -17,7 +17,6 @@ ticker_channel = 'prod_ticker'
 #ticker_channel = 'dev_ticker'
 
 
-
 ## REDIS ##
 ###########
 
