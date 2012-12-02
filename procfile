@@ -1,2 +1,2 @@
 web: python app.py
-celeryd: celeryd -E -B --loglevel=INFO
+worker: celeryd -E -B --loglevel=INFO
