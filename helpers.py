@@ -86,6 +86,39 @@ def is_number(s):
 
 ### PUSH FUNCTION
 
+messages = { 'A': ' just got an assist.',
+			  'GS': ' just scored a Goal!',
+			  'YC': ' just received a Yellow Card!',
+			  'RC': ' has been sent off.',
+			  'PS': ' just saved a Penalty!',
+			  'PM': ' just missed a Penalty!',
+			  'OG': ' just scored an OWN GOAL!',
+			  'S': ' just made 3 saves, +1pt.',
+}
+
+def push_data(dico,current_mp):
+	push_data = []
+	print "pushing data"
+	print dico
+	for player in dico:
+		if 'TP' in dico[player]:
+			for key in dico[player]:
+				if key in messages and dico[player][key] != 0:
+					r.incr('events')
+					eventid = r.get('events')
+					event = { 'playername':dico[player]['playername'],
+								'pid':player,
+								'message':message[key],
+								'time':current_mp
+					 }
+					if key == "S" and int(dico[player][key]) % 3 == 0:
+						push_data.append(event)
+						r.hmset('tickerevent:%s'%eventid,{ 'playername':dico[player]['playername'],'pid':player,'message':message[key],'time':current_mp})
+					else:
+						push_data.append(event)
+						r.hmset('tickerevent:%s'%eventid,{ 'playername':dico[player]['playername'],'pid':player,'message':message[key],'time':current_mp})
+	p[ticker_channel].trigger('ticker', {'event': json.dumps(push_data) })
+
 def push_leagues(team_id):
 	returned_data = {}
 	for league in r.smembers('team:%s:leagues'%team_id):
@@ -94,6 +127,16 @@ def push_leagues(team_id):
 	p[team_id].trigger('league', {'message': returned_data })
 
 
+### DICT DIFFERER
+def dict_diff(dict_a, dict_b):
+    return dict([
+        (key, dict_b.get(key, dict_a.get(key)))
+        for key in set(dict_a.keys()+dict_b.keys())
+        if (
+            (key in dict_a and (not key in dict_b or dict_a[key] != dict_b[key])) or
+            (key in dict_b and (not key in dict_a or dict_a[key] != dict_b[key]))
+        )
+    ])
 
 
 

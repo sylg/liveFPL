@@ -108,6 +108,9 @@
 		</div>
 		<div class="ticker-container row-fluid">
 			<ul id="update" class="nav nav-tabs nav-stacked">
+				{% for event in events %}
+					<li class="pushmsg"><p>[{{ event['time'] }}'] <span rel="tooltip" title="total point:{{ event['TP'] }}pts" class="player-name" pid ="{{event['pid']}}">{{ event['playername'] }}</span>{{ event['message'] }}</p></li>
+				{% endfor %}
 			</ul>
 		</div>
 	</div>
@@ -175,12 +178,10 @@ function tickerOverflow() {
 function playerHiglight(){
 	$('#update li').hover(function(){
 		playerId = $(this).find('span').attr("pid");
-		$("#xtable tbody td[data-lineup*='\'"+playerId+"\'']").parent().css("background-color","#d9edf7");
-		$("#xtable tbody td[data-captain*='"+playerId+"']").append("<span style='float:right;'>(c)</span>");
+		$("#xtable tbody td[data-lineup*='"+playerId+"']").parent().css("background-color","#d9edf7");
 		},
 		function(){
-			$("#xtable tbody td[data-lineup*='\'"+playerId+"\'']").parent().css("background-color","");
-			$("#xtable tbody td[data-captain*='"+playerId+"'] span").remove();
+			$("#xtable tbody td[data-lineup*='"+playerId+"']").parent().css("background-color","");
 	});
 };
 
@@ -355,20 +356,27 @@ $('#sound').click(function(){
 
 
 //Push update for ticker
+var test4 = 'none'
 var pusher = new Pusher('b2c9525770d59267a6a2');
 	    var channel = pusher.subscribe('dev_ticker');
 	    channel.bind('ticker', function(data) {
+	    	$.each(data.event,function(i,val){
+	    		playername = val['playername'];
+	    		pid = val['pid']
+	    		time = val['time']
+	    		msg = val['message']
+	    		totalpts = val['TP']
+	    		eventMsg =  '<li class="pushmsg"><p>['+time+'\'] <span rel="tooltip" title="total point: '+totalpts+' pts" class="player-name" pid ="'+pid+'">'+playername+'</span>'+msg+'</p></li>'
+	    		$(eventMsg).prependTo('#update').hide();
+	    		$('span').tooltip();
+    			$('li').show(600);
+    			playerHiglight();
+	    		var audio = $("#ding")[0];
+    			if (sound == true){
+    				audio.play();
+    			}
+	    	});
 	    	tickerOverflow();
-    		$(data.message).prependTo('#update').hide();
-    		$('span').tooltip();
-    		$('li').show(600);
-    		playerHiglight();
-    		var audio = $("#ding")[0];
-    		if (sound == true){
-    			console.log(sound);
-    			audio.play();
-    		}
-
 	    });
 
 

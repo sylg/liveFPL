@@ -52,8 +52,16 @@ def classic():
 	for tweet in r.hgetall('opta_tweet'):
 		tweets.append([tweet,r.hget('opta_tweet',tweet)])
 
+	#Get Already pushed event to prepoluate ticker
+	i = 1
+	event_count = r.get('events')
+	events = []
+	while i <= int(event_count):
+		print i
+		events.insert(0,r.hgetall('tickerevent:%s'%i))
+		i += 1
 
-	return render_template("classic.html",tweets=tweets,leaguename=leaguename,leagues=leagues,league_id=league_id,currentgw=r.get('currentgw'),return_data=return_data,size=size,data=data,livefpl_status=livefpl_status)
+	return render_template("classic.html",events=events,tweets=tweets,leaguename=leaguename,leagues=leagues,league_id=league_id,currentgw=r.get('currentgw'),return_data=return_data,size=size,data=data,livefpl_status=livefpl_status)
 
 if __name__ == '__main__':
 	# Bind to PORT if defined, otherwise default to 5000.
