@@ -22,7 +22,7 @@ ticker_channel = 'prod_ticker'
 
 #Heroku
 
-redis_url = os.getenv('MYREDIS_URL', 'redis://localhost')
+redis_url = 'redis://:nykDCTjJ3kzf97eCWD@pikachu.ec2.myredis.com:6722/'
 redis_celery_url = "redis://:nykDCTjJ3kzf97eCWD@pikachu.ec2.myredis.com:6722/"
 r = redis.from_url(redis_url, db=0)
 rp = redis.from_url(redis_url, db=1)
