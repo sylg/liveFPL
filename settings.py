@@ -13,8 +13,8 @@ p = pusher.Pusher()
 
 #Ticker Channel
 
-ticker_channel = 'prod_ticker'
-#ticker_channel = 'dev_ticker'
+#ticker_channel = 'prod_ticker'
+ticker_channel = 'dev_ticker'
 
 
 ## REDIS ##
@@ -22,19 +22,19 @@ ticker_channel = 'prod_ticker'
 
 #Heroku
 
-redis_url = 'redis://:nykDCTjJ3kzf97eCWD@pikachu.ec2.myredis.com:6722/'
-redis_celery_url = "redis://:nykDCTjJ3kzf97eCWD@pikachu.ec2.myredis.com:6722/"
-r = redis.from_url(redis_url, db=0)
-rp = redis.from_url(redis_url, db=1)
-rdb = redis.from_url(redis_url, db=2)
+# redis_url = 'redis://:nykDCTjJ3kzf97eCWD@pikachu.ec2.myredis.com:6722/'
+# redis_celery_url = "redis://:nykDCTjJ3kzf97eCWD@pikachu.ec2.myredis.com:6722/"
+# r = redis.from_url(redis_url, db=0)
+# rp = redis.from_url(redis_url, db=1)
+# rdb = redis.from_url(redis_url, db=2)
 
 #Localhost
 
-# redis_url = 'redis://localhost:6379'
-# redis_celery_url = 'redis://localhost:6379'
-# r = redis.StrictRedis(host='localhost', port=6379, db=0)
-# rp = redis.StrictRedis(host='localhost', port=6379, db=1)
-# rdb = redis.StrictRedis(host='localhost', port=6379, db=2)
+redis_url = 'redis://localhost:6379'
+redis_celery_url = 'redis://localhost:6379'
+r = redis.StrictRedis(host='localhost', port=6379, db=0)
+rp = redis.StrictRedis(host='localhost', port=6379, db=1)
+rdb = redis.StrictRedis(host='localhost', port=6379, db=2)
 
 
 #Requests Stuff
