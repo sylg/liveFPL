@@ -113,10 +113,10 @@ def push_data(dico,current_mp):
 					 }
 					if key == "S" and int(dico[player][key]) % 3 == 0:
 						push_data.append(event)
-						r.hmset('tickerevent:%s'%eventid,{ 'playername':dico[player]['playername'],'pid':player,'message':message[key],'time':current_mp})
+						r.hmset('tickerevent:%s'%eventid,{ 'playername':dico[player]['playername'],'pid':player,'message':messages[key],'time':current_mp})
 					else:
 						push_data.append(event)
-						r.hmset('tickerevent:%s'%eventid,{ 'playername':dico[player]['playername'],'pid':player,'message':message[key],'time':current_mp})
+						r.hmset('tickerevent:%s'%eventid,{ 'playername':dico[player]['playername'],'pid':player,'message':messages[key],'time':current_mp})
 	p[ticker_channel].trigger('ticker', {'event': json.dumps(push_data) })
 
 def push_leagues(team_id):
