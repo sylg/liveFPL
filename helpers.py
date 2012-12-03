@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import unicodedata
 from settings import *
+import json
 
 
 def get_teams_in_league(leagueid):
