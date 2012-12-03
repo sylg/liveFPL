@@ -108,7 +108,7 @@ def push_data(dico,current_mp):
 					eventid = r.get('events')
 					event = { 'playername':dico[player]['playername'],
 								'pid':player,
-								'message':message[key],
+								'message':messages[key],
 								'time':current_mp
 					 }
 					if key == "S" and int(dico[player][key]) % 3 == 0:
