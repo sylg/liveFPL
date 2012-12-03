@@ -203,8 +203,8 @@ def scrap_fixture(fixture_id):
 		current_mp = rp.get('current_mp:%s'%fixture_id)
 		old_mp = current_mp
 	else:
-		current_mp = None
-		old_mp = None
+		current_mp = 0
+		old_mp = 0
 	for pid in rp.lrange('lineups:%s'%fixture_id, 0, -1):
 		mp = rp.hget('%s:fresh'%pid,'MP')
 		mp_pool.append(mp)
