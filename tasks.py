@@ -168,7 +168,7 @@ def get_fixture_ids():
 def create_scrapper():
 	if r.llen('fixture_ids') != 0 and r.get('livefpl_status') == 'Live':
 		for ids in r.lrange('fixture_ids',0, -1):
-			scrapper.delay(ids)
+			scrap_fixture.delay(ids)
 
 
 @celery.task(ignore_result=True)
