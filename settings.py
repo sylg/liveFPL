@@ -14,7 +14,7 @@ p = pusher.Pusher()
 #Ticker Channel
 
 ticker_channel = 'prod_ticker'
-# ticker_channel = 'dev_ticker'
+#ticker_channel = 'dev_ticker'
 
 
 ## REDIS ##

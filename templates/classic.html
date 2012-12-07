@@ -203,6 +203,7 @@ $(document).ready(function(){
 var whichMember = 0;
 var returnedData = [];
 var pusher = new Pusher('b2c9525770d59267a6a2');
+			//var presenceChannel = pusher.subscribe('presence-liveLeagues');
 		    var channel = pusher.subscribe(leagueId);
 		    channel.bind('classic', function(data) {
 		    	if ( data == "error 1") {
