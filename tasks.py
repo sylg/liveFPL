@@ -92,7 +92,6 @@ def get_classicdata(leagueid):
 		returned_data[team] = data
 		p[leagueid].trigger('classic', data )
 	r.set('scrapcache:%s'%leagueid, json.dumps(returned_data) )
-	r.expire('scrapcache:%s'%leagueid, 50)
 
 # TICKER RELATED TASKS
 @periodic_task(run_every=crontab(minute='*',hour='10-22',day_of_week='sat,sun,mon,thu'), ignore_result=True)
