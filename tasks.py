@@ -90,7 +90,7 @@ def get_classicdata(leagueid):
 	for team in r.smembers('league:%s'%leagueid):
 		data = scrapteam(team,r.get('currentgw'))
 		returned_data[team] = data
-		p[leagueid].trigger('classic', data )
+		p['%s-prod'%leagueid].trigger('classic', data )
 	r.set('scrapcache:%s'%leagueid, json.dumps(returned_data) )
 
 # TICKER RELATED TASKS

@@ -204,7 +204,7 @@ var whichMember = 0;
 var returnedData = [];
 var pusher = new Pusher('b2c9525770d59267a6a2');
 			//var presenceChannel = pusher.subscribe('presence-liveLeagues');
-		    var channel = pusher.subscribe(leagueId);
+		    var channel = pusher.subscribe(leagueId+'-prod');
 		    channel.bind('classic', function(data) {
 		    	if ( data == "error 1") {
 		    		$('#loading').html('Your league is not in DB.')
@@ -288,6 +288,12 @@ function buildTable(list,table) {
 		//filling the data into the table
 		table.append("<tr align='center'><td data-lineup='"+pidLineup+"' ><a href='http://fantasy.premierleague.com/entry/"+id+"/event-history/{{currentgw}}/'>"
 		+teamname+"</a></td><td>"+captain+"</td><td id='remaining'"+remainingList+">"+remaining+"</td><td>"+transfers+"</td><td>"+gwpts+"</td><td>"+totalpts+"</td></tr>")
+
+		//highlight user team
+		if (id == {{team_id}}){
+			$('tbody > tr').toggleClass('user-team')
+		}
+
 	});
 	//sorting the table on Totalpts
 	$('#xtable').tablesorter({
@@ -359,7 +365,7 @@ $('#sound').click(function(){
 //Push update for ticker
 var test4 = 'none'
 var pusher = new Pusher('b2c9525770d59267a6a2');
-	    var channel = pusher.subscribe('prod_ticker');
+	    var channel = pusher.subscribe('dev_ticker');
 	    channel.bind('ticker', function(data) {
 	    	$.each(data.event,function(i,val){
 	    		playername = val['playername'];

@@ -69,21 +69,22 @@ function validation(){
 
 
 var pusher = new Pusher('b2c9525770d59267a6a2');
-
+var test1 = 0
 $('#live').submit(function(){
     if (validation()){
         $('#loading').on('shown',function(){
             var team_id = $('#team_id').val()
             $.get('/getleagues?team_id='+team_id, function(data) {
+                test1 = data
                 if (data != "None") {
-                    buildModal(data)
+                    buildModal(data,'old')
                     $('#loading').modal('hide');
                     $('#leaguepick').modal();
                 }
                 else {
                     var channel = pusher.subscribe(team_id);
                     channel.bind('league', function(data) {
-                        buildModal(data)
+                        buildModal(data,'fresh')
                         $('#loading').modal('hide');
                         $('#leaguepick').modal();
                     });
@@ -101,19 +102,22 @@ return false;
 });
 
 // Modal League Picker construction
-function buildModal(data){
+function buildModal(data,from){
+    if (from == 'fresh'){
+        data == data.message
+    }
     var notsupported = 0;
-    $.each(data.message, function(i, val) {
+    $.each(data, function(i, val) {
         if (val.players == 0 ) {
             $('#league-no').append('<li><a href="#">'+val.name+'</a></li>')
             notsupported ++;
         }
         else {
             if (val.type == "classic"){
-              $('#league-yes').append('<li><a href="/classic?league_id='+i+'&team_id='+team_id+'">'+val.name+'</a></li>');
+              $('#league-yes').append('<li><a href="/classic?league_id='+i+'&team_id='+$('#team_id').val()+'">'+val.name+'</a></li>');
             }
             else {
-              $('#league-yes').append('<li><a href="/h2h?league_id='+i+'&team_id='+team_id+'">'+val.name+' (H2H League not yet supported)</a></li>');
+              $('#league-yes').append('<li><a href="/h2h?league_id='+i+'&team_id='+$('#team_id').val()+'">'+val.name+' (H2H League not yet supported)</a></li>');
             }
         }
     });
