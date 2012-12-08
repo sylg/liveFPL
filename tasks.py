@@ -180,7 +180,7 @@ def scrap_fixture(fixture_id):
 
 @periodic_task(run_every=crontab(minute='*',hour='10-22',day_of_week='sat,sun,mon,thu'), ignore_result=True)
 def update_live_eagues():
-	if int(rp.get('pushcounter')) > 0:
+	if rp.exists('pushcounter') and int(rp.get('pushcounter')) > 0:
 		get_classicdata.delay('48483')
 
 
