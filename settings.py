@@ -22,8 +22,8 @@ ticker_channel = 'prod_ticker'
 
 #Heroku
 
-redis_url = 'redis://:nykDCTjJ3kzf97eCWD@pikachu.ec2.myredis.com:6722/'
-redis_celery_url = "redis://:nykDCTjJ3kzf97eCWD@pikachu.ec2.myredis.com:6722/"
+redis_url = 'redis://:zkknD6CFj3XEBhbh7cYseHdr6HuOe3laFqTKAmDqrjfBE8jXPOnL86qcGnfX1HuU@node-fe03b4d4d9564505a.openredis.com:10727'
+redis_celery_url = "redis://:zkknD6CFj3XEBhbh7cYseHdr6HuOe3laFqTKAmDqrjfBE8jXPOnL86qcGnfX1HuU@node-fe03b4d4d9564505a.openredis.com:10727"
 r = redis.from_url(redis_url, db=0)
 rp = redis.from_url(redis_url, db=1)
 rdb = redis.from_url(redis_url, db=2)
