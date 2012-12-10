@@ -155,8 +155,9 @@ def update_ticker():
 									else:
 										push_event.append({ 'playername':playername, 'pid':players, 'msg':messages[key]})
 	#Send new events to clients
-	print "There's new event, Pushing..."
 	if push_event:
+		print "There's new event, Pushing..."
+		print push_event
 		p[ticker_channel].trigger('ticker',push_event)
 		#update the league open in the client
 	#backup events sent for reuse.
