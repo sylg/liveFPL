@@ -12,7 +12,7 @@
 <div class="ticker-container row-fluid">
 	<ul id="update" class="nav nav-tabs nav-stacked">
 		{% for event in events %}
-			<li class="pushmsg"><p><span class="player-name" pid ="{{event['pid']}}">{{ event['playername'] }}</span>{{ event['message'] }}</p></li>
+			<li class="pushmsg"><p><span class="player-name" pid ="{{event['pid']}}">{{ event['playername'] }}</span>{{ event['msg'] }}</p></li>
 		{% endfor %}
 	</ul>
 </div>
