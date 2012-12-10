@@ -1,4 +1,5 @@
-console.log{{events}}
+console.log({{events}})
+var t2 = {{events}}
 
 //Push update for ticker
 var pusher = new Pusher('b2c9525770d59267a6a2');
