@@ -1,4 +1,3 @@
-console.log({{events}})
 var t2 = {{events}}
 
 //Push update for ticker
