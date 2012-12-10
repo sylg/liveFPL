@@ -51,7 +51,6 @@ function playerHiglight(){
 	});
 };
 
-
 //Hover playername highlight team
 function playerHiglightH2h(){
 	$('#update li').hover(function(){
@@ -64,8 +63,9 @@ function playerHiglightH2h(){
 				}
 			});
 		});
-		function(){
-			$(".team").removeClass('highlight');
-		}
-	});
-};
+	},
+	function(){
+		$(".team").removeClass('highlight');
+	}
+	);
+}
