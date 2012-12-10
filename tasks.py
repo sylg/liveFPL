@@ -91,7 +91,7 @@ def get_classicdata(leagueid):
 	for team in r.smembers('league:%s'%leagueid):
 		data = scrapteam(team,r.get('currentgw'))
 		returned_data[team] = data
-		p['%s-dev'%leagueid].trigger('classic', data )
+		p['%s-prod'%leagueid].trigger('classic', data )
 	r.set('scrapcache:%s'%leagueid, json.dumps(returned_data) )
 	r.expire('scrapcache:%s'%leagueid,360)
 
@@ -122,7 +122,7 @@ def get_h2hdata(leagueid):
 
 		data = {'home': home, 'away':away}
 		returned_data[i] = data
-		p['%s-dev'%leagueid].trigger('h2h', data )
+		p['%s-prod'%leagueid].trigger('h2h', data )
 		i +=1
 	r.set('scrapcache:%s'%leagueid, json.dumps(returned_data) )
 	r.expire('scrapcache:%s'%leagueid,360)
