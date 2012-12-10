@@ -10,7 +10,7 @@ def get_old_events():
 	events = []
 	if r.exists('events'):
 		for event in r.lrange('events',0,-1):
-			event.append(json.loads(events))
+			events.append(json.loads(events))
 	return events
 
 
