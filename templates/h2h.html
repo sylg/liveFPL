@@ -27,7 +27,7 @@
 var scrapTimer = "{{data|safe}}";
 var leagueId = $('.span8 h4').attr('id');
 var leagueSize = {{size}};
-var t2 = {{events}};
+var t2 = {{events|tojson|safe}}};
 
 var oldScrap = {{return_data |tojson|safe}};
 
