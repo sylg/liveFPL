@@ -48,7 +48,7 @@ def livefpl_status():
 		#Get Average score
 		if soup.find(class_="ismEventInfoAp"):
 			average = soup.find(class_="ismEventInfoAp").text
-			average = str(average[:find('Average')])
+			average = str(average[:average.find('Average')])
 			r.set('Average',average)
 		#Current GW & Clean players DB for ticker
 		currentgw = str(re.findall(r"\d{1,2}", soup.find(class_="ismMegaLarge").string)[0])
