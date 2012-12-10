@@ -84,7 +84,9 @@ if ( $('#loading').length > 0 && scrapTimer == "old") {
 //Page SETUP
 $(document).ready(function(){
 	//start scrapping classic league
-	$.get('/getclassic?league_id='+{{ league_id }});
+	if (scrapTimer != "old"){
+		$.get('/getclassic?league_id='+{{ league_id }});
+	}
 	//start the tweet carousel
 	$('.carousel').carousel({interval: 10000});
 	// Fix the 1st tweet in the carousel

@@ -34,7 +34,9 @@ var oldScrap = {{return_data |tojson|safe}};
 //Page SETUP
 $(document).ready(function(){
 	//Start scrapping h2hleague
-	$.get('/geth2h?league_id='+{{ league_id }});
+	if (scrapTimer != "old"){
+		$.get('/geth2h?league_id='+{{ league_id }});
+	}
 	//start the tweet carousel
 	$('.carousel').carousel({interval: 10000});
 	// Fix the 1st tweet in the carousel
