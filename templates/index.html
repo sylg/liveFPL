@@ -69,7 +69,6 @@ function validation(){
 
 
 var pusher = new Pusher('b2c9525770d59267a6a2');
-var test1 = 0
 $('#live').submit(function(){
     if (validation()){
         $('#loading').on('shown',function(){
@@ -117,7 +116,7 @@ function buildModal(data,from){
               $('#league-yes').append('<li><a href="/classic?league_id='+i+'&team_id='+$('#team_id').val()+'">'+val.name+'</a></li>');
             }
             else {
-              $('#league-yes').append('<li><a href="/h2h?league_id='+i+'&team_id='+$('#team_id').val()+'">'+val.name+' (H2H League not yet supported)</a></li>');
+              $('#league-yes').append('<li><a href="/h2h?league_id='+i+'&team_id='+$('#team_id').val()+'">'+val.name+' (H2H)</a></li>');
             }
         }
     });

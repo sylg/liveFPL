@@ -34,7 +34,7 @@ def get_opta_tweet():
 			r.hset('opta_tweet',tweet_url,text)
 			r.expire('opta_tweet', 86400)
 
-@periodic_task(run_every=crontab(minute='*',hour='7-22',day_of_week='fri,sat,sun,mon,thu'),ignore_result=True)
+@periodic_task(run_every=crontab(minute='*',day_of_week='fri,sat,sun,mon,thu'),ignore_result=True)
 def livefpl_status():
 	with requests.session() as c:
 		c.post('https://users.premierleague.com/PremierUser/redirectLogin', data=payload)
@@ -50,6 +50,7 @@ def livefpl_status():
 		currentgw = str(re.findall(r"\d{1,2}", soup.find(class_="ismMegaLarge").string)[0])
 		if r.exists('currentgw'):
 			if currentgw != r.get('currentgw'):
+				r.flushdb()
 				rp.flushdb()
 				print "Done Flushing the dbs for new GW"
 		r.set('currentgw',currentgw)
@@ -85,101 +86,94 @@ def add_data_db(teamid):
 
 @celery.task(ignore_result=True)
 def get_classicdata(leagueid):
-	print "getting team data for league %s"%leagueid
+	print "getting team data for Classic league %s"%leagueid
 	returned_data = {}
 	for team in r.smembers('league:%s'%leagueid):
 		data = scrapteam(team,r.get('currentgw'))
 		returned_data[team] = data
-		p['%s-prod'%leagueid].trigger('classic', data )
+		p['%s-dev'%leagueid].trigger('classic', data )
 	r.set('scrapcache:%s'%leagueid, json.dumps(returned_data) )
-
-# TICKER RELATED TASKS
-@periodic_task(run_every=crontab(minute='*',hour='10-22',day_of_week='sat,sun,mon,thu'), ignore_result=True)
-def get_fixture_ids():
-	url = 'http://fantasy.premierleague.com/fixtures/'
-	response = requests.get(url)
-	html = response.text
-	soup = BeautifulSoup(html,'lxml')
-	for ids in soup.find_all('a',text="Detailed stats"):
-		fixture_id = ids['data-id']
-		if fixture_id not in r.lrange('fixture_ids',0,-1):
-			r.lpush('fixture_ids', fixture_id)
-
-@periodic_task(run_every=crontab(minute='*',hour='10-22',day_of_week='sat,sun,mon,thu'), ignore_result=True)
-def create_scrapper():
-	if r.exists('fixture_ids') and r.get('livefpl_status') == 'Live':
-		for ids in r.lrange('fixture_ids',0, -1):
-			scrap_fixture.delay(ids)
-
-
+	r.expire('scrapcache:%s'%leagueid,360)
 
 @celery.task(ignore_result=True)
-def scrap_fixture(fixture_id):
-	#Scrap URL
-	url = 'http://fantasy.premierleague.com/fixture/%s/' %fixture_id
-	response = requests.get(url)
-	html = response.text
-	soup = BeautifulSoup(html, 'lxml')
-	#Scrap Team lineup
-	for teams in soup.find_all('table'):
-		teamname = str(teams.find('caption').string)
-		for players in teams.find('tbody').find_all('tr'):
-			pid = 0
-			playername = str(players.td.string.strip())
-			#Convert Webname to Player ID format
-			for ids in rdb.lrange('player_ids',0,-1):
-				if playername == rdb.hget(ids, 'web_name') and teamname == rdb.hget(ids, 'teamname'):
-					pid = ids
-			if pid not in rp.lrange('lineups:%s' %fixture_id, 0, -1):
-				rp.rpush('lineups:%s' %fixture_id, pid)
-			#Store freshly scrapped data
-			rp.hset('%s:fresh'%pid,'TEAMNAME',str(teamname))
-			keys = ['MP', 'GS', 'A', 'CS', 'GC', 'OG', 'PS', 'PM', 'YC', 'RC','S', 'B', 'ESP', 'TP']
-			i = 1
-			for key in keys:
-				rp.hset('%s:fresh'%pid, key, int(players.find_all('td')[i].string.strip()))
-				i += 1
-	#Getting the current playtime
-	mp_pool = []
-	if rp.exists('current_mp:%s'%fixture_id):
-		current_mp = rp.get('current_mp:%s'%fixture_id)
-		old_mp = current_mp
-	else:
-		current_mp = 0
-		old_mp = 0
-	for pid in rp.lrange('lineups:%s'%fixture_id, 0, -1):
-		mp = rp.hget('%s:fresh'%pid,'MP')
-		mp_pool.append(mp)
-	for mp in mp_pool:
-		if int(mp) > int(current_mp):
-			current_mp = mp
-	rp.set('current_mp:%s'%fixture_id,current_mp)
-	print "for fixture %s, the current MP is %s ( old was %s)"%(fixture_id,current_mp, old_mp)
-	#Counting to check if fixture is finished or not.
-	if old_mp == current_mp:
-		r.incr('counter:%s'%fixture_id)
-	#Begin Differential between new and old scrap. Then push
-	diff_update = {}
-	number_of_player = rp.llen('lineups:%s'%fixture_id)
-	for pid in rp.lrange('lineups:%s'%fixture_id, 0, -1):
-		if rp.exists('%s:old'%pid):
-			old = rp.hgetall('%s:old'%pid)
-			fresh = rp.hgetall('%s:fresh'%pid)
-			dictdiff = dict_diff(old,fresh)
-			if dictdiff:
-				dictdiff['playername'] = rdb.hget(pid,'web_name')
-				diff_update[pid] = dictdiff
+def get_h2hdata(leagueid):
+	print "getting team data for H2H league %s"%leagueid
+	returned_data = {}
+	i = 1
+	while i <= int(r.get('match:%s'%leagueid)):
+		match = r.lrange('match:%s:%s'%(leagueid,i),0,-1)
+		home_id = match[0]
+		away_id = match[1]
+		currentgw = r.get('currentgw')
+		if r.exists('average_gwpts'):
+			average_gwpts = r.get('average_gwpts')
 		else:
-			rp.rename('%s:fresh'%pid,'%s:old'%pid)
-	if diff_update:
-		print "I need to push stuff"
-		rp.incr('pushcounter')
-		rp.expire('pushcounter',50)
-		push_data(diff_update,current_mp)
+			average_gwpts = 0
+
+		if home_id == 'Average':
+			home = {'lineup': [0], 'totalpts': 0,'gwpts': average_gwpts,'transfers': "None",'id':0, 'teamname': 'Average'}
+			away = scrapteam(away_id, currentgw)
+		elif away_id == 'Average':
+			home = scrapteam(away_id, currentgw)
+			away = {'lineup': [0], 'totalpts': 0,'gwpts': average_gwpts,'transfers': "None",'id':0, 'teamname': 'Average'}
+		else:
+			home = scrapteam(home_id, currentgw)
+			away = scrapteam(away_id, currentgw)
+
+		data = {'home': home, 'away':away}
+		returned_data[i] = data
+		p['%s-dev'%leagueid].trigger('h2h', data )
+		i +=1
+	r.set('scrapcache:%s'%leagueid, json.dumps(returned_data) )
+	r.expire('scrapcache:%s'%leagueid,360)
+
+
+# TICKER RELATED TASKS
+@periodic_task(run_every=crontab(minute='*',day_of_week='sat,sun,mon,thu'), ignore_result=True)
+def update_ticker():
+	print "checking if there is a event..."
+	get_gw_event()
+	push_event = []
+	#Start Dict differ
+	if r.get('events_status'):
+		events = ['Penalties missed','Penalties saved', 'Goals scored','Assists', 'Yellow cards','Red cards', 'Saves','Own goals','Bonus' ]
+		for event in events:
+			if rp.exists(event):
+				for players in rp.smembers(event):
+					if rp.exists(players+':old'):
+						playername = rp.hget(players+':fresh','playername')
+						fresh = rp.hgetall(players+':fresh')
+						old = rp.hgetall(players+':old')
+						dictdiff = dict_diff(old,fresh)
+						if dictdiff:
+							for key in dictdiff:
+								if key in messages:
+									if key == "Saves" and int(dictdiff[key]) % 3 == 0:
+										push_event.append({ 'playername':playername, 'pid':players, 'msg':messages[key]})
+									elif key == "Bonus":
+										push_event.append({ 'playername':playername, 'pid':players, 'msg':messages[key]%dictdiff[key]})
+									else:
+										push_event.append({ 'playername':playername, 'pid':players, 'msg':messages[key]})
+	#Send new events to clients
+	print "There's new event, Pushing..."
+	if push_event:
+		p[ticker_channel].trigger('ticker',push_event)
+		#update the league open in the client
+	#backup events sent for reuse.
+	for event in push_event:
+		r.rpush('events', json.dumps(event))
+	#rename fresh to old for next scrap
+	print "renaming..."
+	for event in events:
+		if rp.exists(event):
+			for players in rp.smembers(event):
+				if rp.exists(players+':fresh'):
+						rp.rename(players+':fresh',players+':old')
+
 
 
 @periodic_task(run_every=crontab(minute='*',hour='10-22',day_of_week='sat,sun,mon,thu'), ignore_result=True)
-def update_live_eagues():
+def update_live_leagues():
 	if rp.exists('pushcounter') and int(rp.get('pushcounter')) > 0:
 		get_classicdata.delay('48483')
 

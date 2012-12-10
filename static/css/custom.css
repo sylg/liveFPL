@@ -43,3 +43,27 @@
 	   -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
 	          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
 }
+
+/* H2H Table */
+
+#h2h-table tbody td a:hover {
+	text-decoration: none;
+}
+
+.h2h-home {
+	text-align: right!important;
+}
+
+.h2h-score {
+	text-align: center!important;
+	width: 35px;
+}
+
+.score-leader {
+	color: #29AF29;
+	font-weight: bold;
+}
+
+.player-highlight {
+	background: #d9edf7;
+}

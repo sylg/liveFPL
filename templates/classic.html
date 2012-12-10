@@ -1,119 +1,35 @@
 <html>
-<head>
-	<title>{{ leaguename }} | liveFPL</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link href="/static/css/bootstrap.css" rel="stylesheet">
-	<link href="/static/css/custom.css" rel="stylesheet">
-	<link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
-	<script src="http://code.jquery.com/jquery-latest.js"></script>
-	<script src="/static/js/bootstrap.min.js"></script>
-	<script src="/static/js/animator.js"></script>
-	<script src="/static/js/rankingTableUpdate.js"></script>
-	<script src="/static/js/jquery.tablesorter.js"></script>
-	<script src="http://js.pusher.com/1.12/pusher.min.js" type="text/javascript"></script>
-</head>
+{% include 'includes/header.html' %}
 
 <body style="background-image:url('/static/img/groovepaper.png')">
 <audio id="ding">
 	<source src="static/sounds/ding.mp3"></source>
 	<source src="static/sounds/ding.ogg"></source>
 </audio>
-<div class="navbar navbar-inverse navbar-fixed-top">
-<div class="navbar-inner">
-    <a class="brand" href="/">LiveFPL</a>
-    <a href="#"   onclick="location.reload(true)" class="btn btn-success">Refresh</a>
-    <ul class="nav">
-
-    	<li class="dropdown"><a id="leagues" href="#"  class="dropdown-toggle" data-toggle="dropdown">Leagues <b class="caret"></b></a>
-    		<ul class="dropdown-menu">
-    			{% for league in leagues %}
-    				{% if league[1]['players'] != '0' %}
-    					{% if league[1]['type'] == 'classic' %}
-    						<li><a href="/classic?league_id={{league[0]}}&team_id={{team_id}}">{{ league[1]['name'] }} (Classic)</a></li>
-    					{% else %}
-    						<li><a href="/h2h?league_id={{league[0]}}&team_id={{team_id}}">{{ league[1]['name'] }} (H2H)</a></li>
-    				{% endif %}
-    				{% else %}
-    				{% endif %}
-    			{% endfor %}
-    		</ul>
-    	</li>
-    	<li>
-    		<a href="#featuresModal" data-toggle="modal">Features</a>
-    	</li>
-    </ul>
-  </div>
-</div>
+{% include 'includes/nav.html' %}
 
 <div class="container-fluid">
-	<div class="alert alert-success">
-		<button type="button" class="close" data-dismiss="alert">×</button>
-		LiveFPL has been <strong>Updated!</strong> Check the <a href="#featuresModal" data-toggle="modal">Features tab</a> to see what is new!
-	</div>
 	<div class="span8">
 		<h4 id="{{ league_id }}">{{ leaguename }}</h4>
-
-
-		<div id="table_container">
-			<div id="loading" style="margin:20% auto;width:60%;">
-				<p>Please wait while get the data for the {{ size }} teams. <span id="loadcounter"></span></p>
-				<div class="progress progress-warning progress-striped active" style="background-image: -webkit-linear-gradient(top, rgb(240, 240, 240), rgb(231, 231, 231));">
-		  			<div class="bar" style="width: 1%;"></div>
-				</div>
-				<div class="well well-small" style="padding-bottom:0">
-					<div id="tweetCarousel" class="carousel slide">
-						<div class="carousel-inner">
-							{% for tweet in tweets %}
-
-								<div class="item">
-									<h5 style="margin-top:5px;margin-bottom:0;">Did you know?</h5>
-									<p style="padding-top:0;">{{tweet[1]}}</p>
-									<p style="text-align:right;padding-right:12px;margin-right:2px;padding-top:0;"><a href="{{tweet[0]}}" target="_blank">- OptaJoe</a></p>
-								</div>
-							{% endfor %}
-						</div>
-					</div>
-				</div>
-			</div>
-
-
-
-			<table class="table table-bordered" id="xtable">
-				<thead>
-					<tr>
-						<th class="anim:constant sorter-false">Team Name</th>
-						<th class="anim:constant sorter-false">Captain</th>
-						<th class="anim:constant sorter-false">Remaining</th>
-						<th class="anim:constant sorter-false"><span rel='tooltip' data-title='Numbers of transfers made this GW. NOT taken into account in GW Pts.'>Transfers</span></th>
-						<th class="anim:constant sorter-false"><span rel='tooltip' data-title='Total Point for the gameweek {{currentgw}}'>Current GW</span></th>
-						<th class="anim:constant sorter-false"><span rel='tooltip'data-title='Total Point for this season, including this GW points'>Total Points</span></th>
-					</tr>
-				</thead>
-				<tbody>
-				</tbody>
-			</table>
-		</div>
+		{% include 'includes/loading.html' %}
+		<table class="table table-bordered" id="xtable">
+			<thead>
+				<tr>
+					<th class="anim:constant sorter-false">Team Name</th>
+					<th class="anim:constant sorter-false">Captain</th>
+					<th class="anim:constant sorter-false">Remaining</th>
+					<th class="anim:constant sorter-false"><span rel='tooltip' data-title='Numbers of transfers made this GW. NOT taken into account in GW Pts.'>Transfers</span></th>
+					<th class="anim:constant sorter-false"><span rel='tooltip' data-title='Total Point for the gameweek {{currentgw}}'>Current GW</span></th>
+					<th class="anim:constant sorter-false"><span rel='tooltip'data-title='Total Point for this season, including this GW points'>Total Points</span></th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
 	</div>
-	<div class="span4">
-		<div class="row-fluid">
-		<h4>status is: <span id='status'>{{livefpl_status}}</span></h4>
-		</div>
-		<div id="ticker" class="row-fluid">
-			<div class="span6">
-				<h4 class='pull-left'>Latest Update</h4>
-			</div>
-			<div class="span6">
-				<p class="pull-right">Sound: <i id="sound" class="icon-volume-up icon-large"></i></p>
-			</div>
-		</div>
-		<div class="ticker-container row-fluid">
-			<ul id="update" class="nav nav-tabs nav-stacked">
-				{% for event in events %}
-					<li class="pushmsg"><p>[{{ event['time'] }}'] <span rel="tooltip" title="total point:{{ event['TP'] }}pts" class="player-name" pid ="{{event['pid']}}">{{ event['playername'] }}</span>{{ event['message'] }}</p></li>
-				{% endfor %}
-			</ul>
-		</div>
-	</div>
+<div class="span4">
+	{% include 'includes/ticker.html' %}
+</div>
 </div>
 
 
@@ -161,33 +77,15 @@ if ( $('#loading').length > 0 && scrapTimer == "old") {
 	console.log("Got old data. using that")
 	buildTable(oldScrap,$('#xtable'));
 	$('#loading').remove();
+	highlightUserTeam()
 	$('#xtable').show();
 }
 
-// Fix tickerOverlofw
-function tickerOverflow() {
-	if ($('#update li').length >= 5) {
-		$('.ticker-container').attr('style', 'overflow-y:scroll;');
-	}
-	if ($('#update li').length >= 1) {
-		$('#ticker h4').html('Latest Updates');
-	}
-};
-
-//Hover playername highlight team
-function playerHiglight(){
-	$('#update li').hover(function(){
-		playerId = $(this).find('span').attr("pid");
-		$("#xtable tbody td[data-lineup*='"+playerId+"']").parent().css("background-color","#d9edf7");
-		},
-		function(){
-			$("#xtable tbody td[data-lineup*='"+playerId+"']").parent().css("background-color","");
-	});
-};
-
-
 //Page SETUP
 $(document).ready(function(){
+	//start scrapping classic league
+	$.get('/getclassic?league_id='+{{ league_id }});
+	//start the tweet carousel
 	$('.carousel').carousel({interval: 10000});
 	// Fix the 1st tweet in the carousel
 	$('.carousel-inner > .item:nth-child('+[Math.floor(Math.random()*51)]+')').attr('class','active item')
@@ -203,65 +101,60 @@ $(document).ready(function(){
 var whichMember = 0;
 var returnedData = [];
 var pusher = new Pusher('b2c9525770d59267a6a2');
-			//var presenceChannel = pusher.subscribe('presence-liveLeagues');
-		    var channel = pusher.subscribe(leagueId+'-prod');
-		    channel.bind('classic', function(data) {
-		    	if ( data == "error 1") {
-		    		$('#loading').html('Your league is not in DB.')
-		    	}
-		    	else {
+var channel = pusher.subscribe(leagueId+'-prod');
+channel.bind('classic', function(data) {
+	if ( $('#loading').length ) {
+    	if ( whichMember <= leagueSize) {
+    		returnedData.push(data)
+    		whichMember ++;
+    		updateLoadingBar();
+    		if ( whichMember == leagueSize ){
+    				buildTable(returnedData, $('#xtable'))
+					//Table is complete. removing loading div and showing table
+					$('#loading').fadeOut('fast',function(){
+	    					$(this).remove();
+	    					highlightUserTeam()
+	    					$('#xtable').fadeIn('slow');
+	   				});
+	   			//reseting variable for next push
+    			whichMember = 0;
+    			returnedData = [];
+    		}
+    	}
+    }
+    else {
+		if ( whichMember <= leagueSize) {
+    		returnedData.push(data)
+    		whichMember ++;
+    		updateLoadingBar();
+    		if ( whichMember == leagueSize ){
+    			var cloned = $('#xtable').clone();
+    			cloned.find("tr:gt(0)").remove()
+    			buildTable(returnedData,cloned)
+    			cloned.tablesorter({
+					sortList: [[5,1]]
+				 });
+				$('#xtable').rankingTableUpdate(cloned,{
+					animationSettings: {
+								        up: {
+								            left: -25,
+								            backgroundColor: '#CCFFCC'
+								        },
+								        down: {
+								            left: 25,
+								            backgroundColor: '#FFCCCC'
+								        },
+								    }
 
-					if ( $('#loading').length ) {
-				    	if ( whichMember <= leagueSize) {
-				    		returnedData.push(data)
-				    		whichMember ++;
-				    		updateLoadingBar();
-				    		if ( whichMember == leagueSize ){
-				    				buildTable(returnedData, $('#xtable'))
-									//Table is complete. removing loading div and showing table
-									$('#loading').fadeOut('fast',function(){
-					    					$(this).remove();
-					    					$('#xtable').fadeIn('slow');
-					   				});
-					   			//reseting variable for next push
-				    			whichMember = 0;
-				    			returnedData = [];
-				    		}
-				    	}
-				    }
-				    else {
-						if ( whichMember <= leagueSize) {
-				    		returnedData.push(data)
-				    		whichMember ++;
-				    		updateLoadingBar();
-				    		if ( whichMember == leagueSize ){
-				    			var cloned = $('#xtable').clone();
-				    			cloned.find("tr:gt(0)").remove()
-				    			buildTable(returnedData,cloned)
-				    			cloned.tablesorter({
-									sortList: [[5,1]]
-								 });
-								$('#xtable').rankingTableUpdate(cloned,{
-									animationSettings: {
-												        up: {
-												            left: -25,
-												            backgroundColor: '#CCFFCC'
-												        },
-												        down: {
-												            left: 25,
-												            backgroundColor: '#FFCCCC'
-												        },
-												    }
-
-								});
-							$('#xtable [rel=tooltip]').tooltip();
-							whichMember = 0;
-				    		returnedData = [];
-				    		}
-				    	}
-				    }
-				}
-		    });
+				});
+			highlightUserTeam()
+			$('#xtable [rel=tooltip]').tooltip();
+			whichMember = 0;
+    		returnedData = [];
+    		}
+    	}
+    }
+});
 
 //update loading bar
 function updateLoadingBar() {
@@ -286,14 +179,8 @@ function buildTable(list,table) {
 		var remainingList = getRemainingList(lineup);
 
 		//filling the data into the table
-		table.append("<tr align='center'><td data-lineup='"+pidLineup+"' ><a href='http://fantasy.premierleague.com/entry/"+id+"/event-history/{{currentgw}}/'>"
+		table.append("<tr align='center'><td data-id='"+id+"' data-lineup='"+pidLineup+"' ><a href='http://fantasy.premierleague.com/entry/"+id+"/event-history/{{currentgw}}/'>"
 		+teamname+"</a></td><td>"+captain+"</td><td id='remaining'"+remainingList+">"+remaining+"</td><td>"+transfers+"</td><td>"+gwpts+"</td><td>"+totalpts+"</td></tr>")
-
-		//highlight user team
-		if (id == {{team_id}}){
-			$('tbody > tr').toggleClass('user-team')
-		}
-
 	});
 	//sorting the table on Totalpts
 	$('#xtable').tablesorter({
@@ -346,49 +233,15 @@ function getRemainingList (lineup) {
 }
 
 
-
-// SOUND
-var sound = true;
-$('#sound').click(function(){
-	if (sound == true){
-		$(this).removeClass("icon-volume-up").addClass("icon-volume-off")
-		sound = false;
-	}
-	else{
-		$(this).removeClass("icon-volume-off").addClass("icon-volume-up")
-		sound = true;
-	}
-});
-
-
-
-//Push update for ticker
-var test4 = 'none'
-var pusher = new Pusher('b2c9525770d59267a6a2');
-	    var channel = pusher.subscribe('dev_ticker');
-	    channel.bind('ticker', function(data) {
-	    	$.each(data.event,function(i,val){
-	    		playername = val['playername'];
-	    		pid = val['pid']
-	    		time = val['time']
-	    		msg = val['message']
-	    		totalpts = val['TP']
-	    		eventMsg =  '<li class="pushmsg"><p>['+time+'\'] <span rel="tooltip" title="total point: '+totalpts+' pts" class="player-name" pid ="'+pid+'">'+playername+'</span>'+msg+'</p></li>'
-	    		$(eventMsg).prependTo('#update').hide();
-	    		$('span').tooltip();
-    			$('li').show(600);
-    			playerHiglight();
-	    		var audio = $("#ding")[0];
-    			if (sound == true){
-    				audio.play();
-    			}
-	    	});
-	    	tickerOverflow();
-	    });
-
-
-
-
+//Highlight user team
+function highlightUserTeam(){
+	var teamId = {{team_id}}
+	$('#xtable tbody tr').each(function(){
+		if (parseInt($(this).find('td').attr('data-id')) == teamId){
+			$(this).addClass('user-team')
+		}
+	});
+}
 
 
 </script>
