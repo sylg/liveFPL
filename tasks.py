@@ -165,8 +165,8 @@ def update_ticker():
 		p[ticker_channel].trigger('ticker',push_event)
 		#update the league open in the client
 	#backup events sent for reuse.
-	for event in push_event:
-		r.rpush('events', json.dumps(event))
+		for event in push_event:
+			r.rpush('events', json.dumps(event))
 	#rename fresh to old for next scrap
 	print "renaming..."
 	for event in events:
