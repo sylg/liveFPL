@@ -1,0 +1,18 @@
+<div class="row-fluid">
+<h4>status is: <span id='status'>{{livefpl_status}}</span></h4>
+</div>
+<div id="ticker" class="row-fluid">
+	<div class="span6">
+		<h4 class='pull-left'>Latest Update</h4>
+	</div>
+	<div class="span6">
+		<p class="pull-right">Sound: <i id="sound" class="icon-volume-up icon-large"></i></p>
+	</div>
+</div>
+<div class="ticker-container row-fluid">
+	<ul id="update" class="nav nav-tabs nav-stacked">
+		{% for event in events %}
+			<li class="pushmsg"><p>[{{ event['time'] }}'] <span rel="tooltip" title="total point:{{ event['TP'] }}pts" class="player-name" pid ="{{event['pid']}}">{{ event['playername'] }}</span>{{ event['message'] }}</p></li>
+		{% endfor %}
+	</ul>
+</div>

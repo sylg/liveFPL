@@ -1,0 +1,26 @@
+<div class="navbar navbar-inverse navbar-fixed-top">
+<div class="navbar-inner">
+    <a class="brand" href="/">LiveFPL</a>
+    <a href="#"   onclick="location.reload(true)" class="btn btn-success">Refresh</a>
+    <ul class="nav">
+
+    	<li class="dropdown"><a id="leagues" href="#"  class="dropdown-toggle" data-toggle="dropdown">Leagues <b class="caret"></b></a>
+    		<ul class="dropdown-menu">
+    			{% for league in leagues %}
+    				{% if league[1]['players'] != '0' %}
+    					{% if league[1]['type'] == 'classic' %}
+    						<li><a href="/classic?league_id={{league[0]}}&team_id={{team_id}}">{{ league[1]['name'] }} (Classic)</a></li>
+    					{% else %}
+    						<li><a href="/h2h?league_id={{league[0]}}&team_id={{team_id}}">{{ league[1]['name'] }} (H2H)</a></li>
+    				{% endif %}
+    				{% else %}
+    				{% endif %}
+    			{% endfor %}
+    		</ul>
+    	</li>
+    	<li>
+    		<a href="#featuresModal" data-toggle="modal">Features</a>
+    	</li>
+    </ul>
+  </div>
+</div>

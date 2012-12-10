@@ -1,0 +1,180 @@
+<html>
+{% include 'includes/header.html' %}
+<body style="background-image:url('/static/img/groovepaper.png')">
+{% include 'includes/nav.html' %}
+<div class="container-fluid">
+	<div class="span8">
+		<h4 id="{{ league_id }}">{{ leaguename }}</h4>
+		{% include 'includes/loading.html' %}
+		<table class="table table-bordered hide" id="h2h-table">
+			<thead>
+				<th class="h2h-home anim:constant sorter-false">Home</th>
+				<th style="text-align:center"class="sorter-false"></th>
+				<th style="text-align:center"class="sorter-false"></th>
+				<th class="anim:constant sorter-false">Away</th>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+	</div>
+<div class="span4">
+	{% include 'includes/ticker.html' %}
+</div>
+</div>
+
+
+<script type="text/javascript">
+var scrapTimer = "{{data|safe}}";
+var leagueId = $('.span8 h4').attr('id');
+var leagueSize = {{size}};
+var oldScrap = {{return_data |tojson|safe}};
+
+//Page SETUP
+$(document).ready(function(){
+	//Start scrapping h2hleague
+	$.get('/geth2h?league_id='+{{ league_id }});
+	//start the tweet carousel
+	$('.carousel').carousel({interval: 10000});
+	// Fix the 1st tweet in the carousel
+	$('.carousel-inner > .item:nth-child('+[Math.floor(Math.random()*51)]+')').attr('class','active item')
+	//Activate tooltip
+	$('[rel=tooltip]').tooltip();
+	// Fix Ticker update overflow
+	tickerOverflow();
+	playerHiglight();
+});
+
+
+
+//update loading bar
+function updateLoadingBar() {
+	$('#loadcounter').text("("+whichMember+"/"+leagueSize+")")
+	percentage = Math.round(whichMember / leagueSize * 100);
+	$('.bar').attr('style',"width:"+percentage+"%")
+}
+// build table with already scrapped data
+if ( $('#loading').length > 0 && scrapTimer == "old") {
+	console.log("Got old data. using that")
+	buildTable(oldScrap, $('#h2h-table'));
+	$('#loading').remove();
+	highlightH2hLeader();
+	$('#h2h-table').show();
+	highlightUserTeam();
+}
+
+
+//Push table update
+var whichMember = 0;
+var returnedData = [];
+var tt;
+var pusher = new Pusher('b2c9525770d59267a6a2');
+var channel = pusher.subscribe(leagueId+'-prod');
+channel.bind('h2h', function(data) {
+	if ( $('#loading').length ) {
+    	if ( whichMember <= leagueSize) {
+    		returnedData.push(data)
+    		whichMember = whichMember +2;
+    		updateLoadingBar();
+    		if ( whichMember == leagueSize ){
+    			buildTable(returnedData,$('#h2h-table'));
+    			//Table is complete. removing loading div and showing table
+    			$('#loading').fadeOut('fast',function(){
+					$(this).remove();
+					highlightH2hLeader();
+					highlightUserTeam()
+					$('#h2h-table').fadeIn('slow');
+   				});
+
+	   			//reseting variable for next push
+    			whichMember = 0;
+    			returnedData = [];
+    		}
+    	}
+    }
+    else {
+		if ( whichMember <= leagueSize) {
+    		returnedData.push(data)
+    		whichMember = whichMember +2;
+    		updateLoadingBar();
+    		if ( whichMember == leagueSize ){
+    			var cloned = $('#h2h-table').clone();
+    			cloned.find("tr:gt(0)").remove()
+    			buildTable(returnedData,cloned)
+    			$('#h2h-table').rankingTableUpdate(cloned)
+    			highlightUserTeam();
+    			highlightH2hLeader();
+
+
+    		//reseting variable for next push
+			whichMember = 0;
+    		returnedData = [];
+    		}
+    	}
+    }
+});
+
+//Table Builder
+function buildTable(list,table) {
+	$.each(list,function(i, match){
+		table.append('<tr><td data-lineup="'+getPidLineup(match.home.lineup)+'" data-id="'+match.home.id+'" class="h2h-home"><a href="http://fantasy.premierleague.com/entry/'+match.home.id+'/event-history/{{currentgw}}/">'+match.home.teamname+'</a></td><td class="h2h-score">'+getTrueGwPts(match.home.gwpts, match.home.transfers)+'</td><td class="h2h-score">'+getTrueGwPts(match.away.gwpts, match.away.transfers)+'</td><td data-lineup="'+getPidLineup(match.away.lineup)+'" data-id="'+match.away.id+'" class="h2h-away"><a href="http://fantasy.premierleague.com/entry/'+match.away.id+'/event-history/{{currentgw}}/">'+match.away.teamname+'</a></td></tr>'
+		)
+	});
+	$("tbody tr td").each(function() {
+		if ($(this).attr('data-id') == 0 ) {
+			$(this).children('a').replaceWith('Average')
+		}
+	});
+
+}
+
+// Helpfer function for table update
+function getPidLineup (lineup){
+	pidLineup = [];
+	$.each(lineup, function(i,player){
+		pidLineup.push(player['pid']);
+	});
+	return pidLineup;
+}
+
+//Calculate gwpts with transfers malus
+function getTrueGwPts(gwpts,transfers){
+	val = 0;
+	if ( transfers.indexOf("(") > -1) {
+		pos = transfers.indexOf("(") + 1;
+		val = transfers.slice(pos+1, -4);
+	}
+	return gwpts - val;
+}
+//Highlight Winning score in H2H Table
+function highlightH2hLeader(){
+	$('#h2h-table tbody tr').each(function() {
+   		homeScore = $(this).find(".h2h-score")
+		awayScore = $(this).find(".h2h-score:last")
+		if (parseInt(homeScore.html()) > parseInt(awayScore.html())){
+			homeScore.addClass('score-leader')
+			awayScore.removeClass('score-leader')
+		}
+		else {
+		homeScore.removeClass('score-leader')
+		awayScore.addClass('score-leader')
+		}
+	});
+}
+//Highlight user team
+function highlightUserTeam(){
+	var teamId = {{team_id}}
+	$('#h2h-table tbody tr').each(function(){
+		if (parseInt($(this).find('td').attr('data-id')) == teamId || parseInt($('td:last', this).attr('data-id')) == teamId){
+			$(this).addClass('user-team')
+		}
+	});
+}
+
+
+</script>
+
+
+
+
+</body>
+</html>
