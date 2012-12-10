@@ -156,7 +156,7 @@ def update_ticker():
 										push_event.append({ 'playername':playername, 'pid':players, 'msg':messages[key]})
 									elif key == "Bonus":
 										push_event.append({ 'playername':playername, 'pid':players, 'msg':messages[key]%dictdiff[key]})
-									else:
+									elif key != "Saves" and key != "Bonus":
 										push_event.append({ 'playername':playername, 'pid':players, 'msg':messages[key]})
 	#Send new events to clients
 	if push_event:
