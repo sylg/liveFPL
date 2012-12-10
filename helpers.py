@@ -4,6 +4,16 @@ import unicodedata
 from settings import *
 import json
 
+
+
+def get_old_events():
+	events = []
+	if r.exists('events'):
+		for events in r.lrange('events',0,-1):
+			events.append(json.loads(events))
+	return events
+
+
 def scrapteam(teamid,currentgw):
 	url = "http://fantasy.premierleague.com/entry/%s/event-history/%s/"%(teamid,currentgw)
 	response = requests.get(url)

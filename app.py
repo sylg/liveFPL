@@ -63,7 +63,7 @@ def h2h():
 		return_data = 0
 		data = "fresh"
 
-	return render_template("h2h.html",return_data=return_data,data=data,currentgw=r.get('currentgw'),size=size,tweets=tweets,team_id=team_id,league_id=league_id,livefpl_status=livefpl_status, leaguename=leaguename,leagues=leagues)
+	return render_template("h2h.html",events=get_old_events(), return_data=return_data,data=data,currentgw=r.get('currentgw'),size=size,tweets=tweets,team_id=team_id,league_id=league_id,livefpl_status=livefpl_status, leaguename=leaguename,leagues=leagues)
 
 @app.route("/classic")
 def classic():
@@ -87,7 +87,7 @@ def classic():
 	for tweet in r.hgetall('opta_tweet'):
 		tweets.append([tweet,r.hget('opta_tweet',tweet)])
 
-	return render_template("classic.html",team_id=team_id,tweets=tweets,leaguename=leaguename,leagues=leagues,league_id=league_id,currentgw=r.get('currentgw'),return_data=return_data,size=size,data=data,livefpl_status=livefpl_status)
+	return render_template("classic.html",events=get_old_events(),team_id=team_id,tweets=tweets,leaguename=leaguename,leagues=leagues,league_id=league_id,currentgw=r.get('currentgw'),return_data=return_data,size=size,data=data,livefpl_status=livefpl_status)
 
 if __name__ == '__main__':
 	# Bind to PORT if defined, otherwise default to 5000.
