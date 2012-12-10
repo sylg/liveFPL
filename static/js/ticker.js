@@ -1,3 +1,5 @@
+console.log{{events}}
+
 //Push update for ticker
 var pusher = new Pusher('b2c9525770d59267a6a2');
 var channel = pusher.subscribe('prod_ticker');
@@ -11,10 +13,10 @@ channel.bind('ticker', function(data) {
 	});
 	playerHiglight();
 	tickerOverflow();
-	var audio = $("#ding")[0];
-	if (sound == true){
-		audio.play();
-	}
+	// var audio = $("#ding")[0];
+	// if (sound == true){
+	// 	audio.play();
+	// }
 });
 
 // SOUND
