@@ -66,5 +66,6 @@ function playerHiglightH2h(){
 		});
 		function(){
 			$(".team").removeClass('highlight');
+		}
 	});
 };
