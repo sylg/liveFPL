@@ -120,7 +120,7 @@ channel.bind('h2h', function(data) {
 //Table Builder
 function buildTable(list,table) {
 	$.each(list,function(i, match){
-		table.append('<tr><td data-lineup="'+getPidLineup(match.home.lineup)+'" data-id="'+match.home.id+'" class="h2h-home"><a href="http://fantasy.premierleague.com/entry/'+match.home.id+'/event-history/{{currentgw}}/">'+match.home.teamname+'</a></td><td class="h2h-score">'+getTrueGwPts(match.home.gwpts, match.home.transfers)+'</td><td class="h2h-score">'+getTrueGwPts(match.away.gwpts, match.away.transfers)+'</td><td data-lineup="'+getPidLineup(match.away.lineup)+'" data-id="'+match.away.id+'" class="h2h-away"><a href="http://fantasy.premierleague.com/entry/'+match.away.id+'/event-history/{{currentgw}}/">'+match.away.teamname+'</a></td></tr>'
+		table.append('<tr><td data-lineup="'+getPidLineup(match.home.lineup)+'" data-id="'+match.home.id+'" class="h2h-home team"><a href="http://fantasy.premierleague.com/entry/'+match.home.id+'/event-history/{{currentgw}}/">'+match.home.teamname+'</a></td><td class="h2h-score">'+getTrueGwPts(match.home.gwpts, match.home.transfers)+'</td><td class="h2h-score">'+getTrueGwPts(match.away.gwpts, match.away.transfers)+'</td><td data-lineup="'+getPidLineup(match.away.lineup)+'" data-id="'+match.away.id+'" class="h2h-away team"><a href="http://fantasy.premierleague.com/entry/'+match.away.id+'/event-history/{{currentgw}}/">'+match.away.teamname+'</a></td></tr>'
 		)
 	});
 	$("tbody tr td").each(function() {

@@ -50,3 +50,24 @@ function playerHiglight(){
 			$("#xtable tbody td[data-lineup*='"+playerId+"']").parent().css("background-color","");
 	});
 };
+
+
+//Hover playername highlight team
+// function playerHiglightH2h(){
+// 	$('#update li').hover(function(){
+// 		playerId = $(this).find('span').attr("pid");
+// 		$(".team").each(function(){
+// 			console.log($(this).attr('data-lineup').split(','))
+// 				lineup = $(this).attr('data-lineup').split(',')
+// 				console.log(lineup[0])
+
+
+
+// 		});
+
+// 		$("#h2h-table tbody td[lineup*='\'"+playerId+"\'']").css("background-color","#d9edf7");
+// 		},
+// 		function(){
+// 			$("#h2h-table tbody td[lineup*='\'"+playerId+"\'']").css("background-color","");
+// 	});
+};
