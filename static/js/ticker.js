@@ -9,7 +9,7 @@ channel.bind('ticker', function(data) {
 		$(eventMsg).prependTo('#update').hide();
 		$('li').show(600);
 	});
-	playerHiglight();
+	// playerHiglight();
 	tickerOverflow();
 	// var audio = $("#ding")[0];
 	// if (sound == true){
@@ -40,32 +40,31 @@ function tickerOverflow() {
 	}
 };
 
-//Hover playername highlight team
-function playerHiglight(){
-	$('#update li').hover(function(){
-		playerId = $(this).find('span').attr("pid");
-		$("#xtable tbody td[data-lineup*='"+playerId+"']").parent().css("background-color","#d9edf7");
-		},
-		function(){
-			$("#xtable tbody td[data-lineup*='"+playerId+"']").parent().css("background-color","");
-	});
-};
+// //Hover playername highlight team
+// function playerHiglight(){
+// 	$('#update li').hover(function(){
+// 		playerId = $(this).find('span').attr("pid");
+// 		$("#xtable tbody td[data-lineup*='"+playerId+"']").parent().css("background-color","#d9edf7");
+// 		},
+// 		function(){
+// 			$("#xtable tbody td[data-lineup*='"+playerId+"']").parent().css("background-color","");
+// 	});
+// };
 
-//Hover playername highlight team
-function playerHiglightH2h(){
-	$('#update li').hover(function(){
-		playerId = $(this).find('span').attr("pid");
-		$(".team").each(function(){
-			lineup = $(this).attr('data-lineup').split(',')
-			lineup.each(function(i, id){
-				if (id == playerId){
-					$(this).addClass('highlight');
-				}
-			});
-		});
-	},
-	function(){
-		$(".team").removeClass('highlight');
-	}
-	);
-}
+
+// //Hover playername highlight team
+// function playerHiglightH2h(){
+// 	$('#update li').hover(function(){
+// 		playerId = $(this).find('span').attr("pid");
+// 		$(".team").each(function(){
+// 			lineup = $(this).attr('data-lineup').split(',')
+// 			$.each(lineup,function(i,id){
+// 				if (parseInt(id) == parseInt(playerId)){
+// 					console.log("tru")
+// 					$(this).addClass('highlight')
+// 				}
+// 			});
+// 		});
+// 	}
+// 	);
+// }

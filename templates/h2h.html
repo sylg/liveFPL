@@ -35,6 +35,7 @@ var oldScrap = {{return_data |tojson|safe}};
 $(document).ready(function(){
 	//Start scrapping h2hleague
 	if (scrapTimer != "old"){
+		console.log('I need to scrap.')
 		$.get('/geth2h?league_id='+{{ league_id }});
 	}
 	//start the tweet carousel
@@ -149,21 +150,21 @@ function getTrueGwPts(gwpts,transfers){
 	}
 	return gwpts - val;
 }
-//Highlight Winning score in H2H Table
-function highlightH2hLeader(){
-	$('#h2h-table tbody tr').each(function() {
-   		homeScore = $(this).find(".h2h-score")
-		awayScore = $(this).find(".h2h-score:last")
-		if (parseInt(homeScore.html()) > parseInt(awayScore.html())){
-			homeScore.addClass('score-leader')
-			awayScore.removeClass('score-leader')
-		}
-		else {
-		homeScore.removeClass('score-leader')
-		awayScore.addClass('score-leader')
-		}
-	});
-}
+// //Highlight Winning score in H2H Table
+// function highlightH2hLeader(){
+// 	$('#h2h-table tbody tr').each(function() {
+//    		homeScore = $(this).find(".h2h-score")
+// 		awayScore = $(this).find(".h2h-score:last")
+// 		if (parseInt(homeScore.html()) > parseInt(awayScore.html())){
+// 			homeScore.addClass('score-leader')
+// 			awayScore.removeClass('score-leader')
+// 		}
+// 		else {
+// 		homeScore.removeClass('score-leader')
+// 		awayScore.addClass('score-leader')
+// 		}
+// 	});
+// }
 //Highlight user team
 function highlightUserTeam(){
 	var teamId = {{team_id}}
