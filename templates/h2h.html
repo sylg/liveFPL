@@ -46,7 +46,7 @@ $(document).ready(function(){
 	$('[rel=tooltip]').tooltip();
 	// Fix Ticker update overflow
 	tickerOverflow();
-	playerHiglight();
+	//playerHiglight();
 });
 
 
@@ -62,7 +62,7 @@ if ( $('#loading').length > 0 && scrapTimer == "old") {
 	console.log("Got old data. using that")
 	buildTable(oldScrap, $('#h2h-table'));
 	$('#loading').remove();
-	highlightH2hLeader();
+	HighlightH2hLeader();
 	$('#h2h-table').show();
 	highlightUserTeam();
 }
@@ -75,6 +75,7 @@ var tt;
 var pusher = new Pusher('b2c9525770d59267a6a2');
 var channel = pusher.subscribe(leagueId+'-prod');
 channel.bind('h2h', function(data) {
+	console.log("getting data...", data)
 	if ( $('#loading').length ) {
     	if ( whichMember <= leagueSize) {
     		returnedData.push(data)
@@ -150,21 +151,21 @@ function getTrueGwPts(gwpts,transfers){
 	}
 	return gwpts - val;
 }
-// //Highlight Winning score in H2H Table
-// function highlightH2hLeader(){
-// 	$('#h2h-table tbody tr').each(function() {
-//    		homeScore = $(this).find(".h2h-score")
-// 		awayScore = $(this).find(".h2h-score:last")
-// 		if (parseInt(homeScore.html()) > parseInt(awayScore.html())){
-// 			homeScore.addClass('score-leader')
-// 			awayScore.removeClass('score-leader')
-// 		}
-// 		else {
-// 		homeScore.removeClass('score-leader')
-// 		awayScore.addClass('score-leader')
-// 		}
-// 	});
-// }
+//Highlight Winning score in H2H Table
+function highlightH2hLeader(){
+	$('#h2h-table tbody tr').each(function() {
+   		homeScore = $(this).find(".h2h-score")
+		awayScore = $(this).find(".h2h-score:last")
+		if (parseInt(homeScore.html()) > parseInt(awayScore.html())){
+			homeScore.addClass('score-leader')
+			awayScore.removeClass('score-leader')
+		}
+		else {
+		homeScore.removeClass('score-leader')
+		awayScore.addClass('score-leader')
+		}
+	});
+}
 //Highlight user team
 function highlightUserTeam(){
 	var teamId = {{team_id}}
